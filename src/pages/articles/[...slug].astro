@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../../utils";
+import Tags from "../../components/Tags.astro";
+
+const blogs: CollectionEntry<'blog'>[] = await getCollection('blog');
+
+
+const { slug } = Astro.params;
+
+const blog = blogs.find((b) => b.slug === slug);
+if (!blog) return Astro.redirect('/404');
+const {Content} = await blog.render();
+---
+
+<MainLayout>
+
+    <section class="container mx-auto max-w-screen-lg mt-10 px-8">
+        <a href="/articles" class="inline-block bg-gray-100 p-2 mb-6 hover:bg-indigo-500 hover:text-white">Back To Articles</a>
+        <article>
+          <h1 class="text-4xl font-bold mb-2">{blog.data.title}</h1>
+          <h3 class="text-lg mb-2">Written by {blog.data.author} on {formatDate(blog.data.pubDate)}</h3>
+          <div class="my-6">
+            <Tags tags={blog.data.tags} />
+          </div>
+        
+          <img src={"/images/" + blog.data.image} alt="Article Image" class="w-full h-auto rounded-xl mb-6" />
+          <Content />
+        </article>
+      </section>
+</MainLayout>
+
+<style is:global>
+  p {
+    margin: 20px 0;
+  }
+  h2 {
+    margin: 20px 0;
+    font-size: 1.8rem;
+  }
+</style>
